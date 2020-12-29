@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result</title>
+    <script>
+        function getParam(sname) {
+            var params = location.search.substr(location.search.indexOf("?") + 1);
+            var sval = "";
+            params = params.split("&");
+            for (var i = 0; i < params.length; i++) {
+                temp = params[i].split("=");
+                if ([temp[0]] == sname) { sval = temp[1]; }
+            }
+            return sval;
+        }
+
+        var url = getParam("secure");
+    </script>
+</head>
+<body>
+<img id="before">
+<img id="after">
+
+<script>
+    document.getElementById('before').src='static/upload/' + url;
+    document.getElementById('after').src='static/results/' + url;
+</script>
+</body>
+
+</html>
