@@ -14,6 +14,4 @@ RUN mkdir trafficlight
 
 COPY . /trafficlight
 
-RUN cd /trafficlight && wget http://download.louissoft.kr/yolov3.weights -P /trafficlight/yolov3.weights
-
 CMD cd /trafficlight && python3 /trafficlight/test.py
