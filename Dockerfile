@@ -10,8 +10,6 @@ RUN pip3 install Flask
 
 RUN pip3 install opencv-python
 
-RUN mkdir trafficlight
-
 RUN cd / && git clone https://github.com/bakjiho/TrafficLightExample.git
 
-CMD cd /trafficlight && python3 /trafficlight/test.py
+CMD cd /TrafficLightExample && python3 /TrafficLightExample/test.py
