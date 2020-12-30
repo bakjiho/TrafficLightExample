@@ -4,7 +4,7 @@
 This project recognize traffic lights at korea.
 It uses YOLOv3 and OpenCV libraries with python3
 
-![test](https://github.com/bakjiho/TrafficLightExample/raw/master/media/testing.gif =600x)
+![testing](https://github.com/bakjiho/TrafficLightExample/raw/master/media/testing.gif=600x)
 
 
 ## Class structure
@@ -33,5 +33,3 @@ and go url with your browsers.
 http://localhost/
 ```
 done!
-
-## Example
