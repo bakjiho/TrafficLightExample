@@ -4,7 +4,7 @@
 This project recognize traffic lights at korea.
 It uses YOLOv3 and OpenCV libraries with python3.
 
-It takes 7,000 traffic light images and 30,000 training counts.
+It takes 7,000 traffic light images and 30,000 training counts for training.
 
 ![testing](https://user-images.githubusercontent.com/6459539/103330330-5a006780-4aa4-11eb-93f6-8a57aa2b5beb.gif)
 
