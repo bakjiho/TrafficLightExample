@@ -34,5 +34,5 @@ http://localhost/
 ```
 done!
 
-## Example
-![example](https://user-images.githubusercontent.com/6459539/103330379-99c74f00-4aa4-11eb-91ea-507878e788d4.jpg)
+## Result image
+![result](https://user-images.githubusercontent.com/6459539/103330379-99c74f00-4aa4-11eb-91ea-507878e788d4.jpg)
