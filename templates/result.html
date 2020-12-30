@@ -1,10 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
-    <meta charset="UTF-8">
-    <title>Result</title>
-    <script>
-        function getParam(sname) {
+  <meta charset="UTF-8">
+  <title>Traffic Light Demo</title>
+  <link rel='stylesheet' href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+  <style>
+  	html {
+		    height: 100%;
+		    -webkit-font-smoothing: antialiased; 
+			font-smoothing: antialiased;
+			text-rendering: optimizelegibility; }
+
+		body{
+			overflow: hidden;
+			height: 100%;
+		    margin: 0;
+		    padding: 0;
+			line-height: 1;
+			color: #181b20;
+			-webkit-font-smoothing: antialiased;
+			text-align: center;
+			font: 16px/28px "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", helvetica, arial, sans-serif; }
+
+		a:active, a:focus { outline: none!important; }
+
+		ul, li{ 
+			list-style-type: none;
+			margin: 0;
+			padding: 0; }
+
+
+	/* BODY */
+	
+	#title{
+
+		padding-bottom: 20px;
+	}
+		h1{
+			padding-top: 30px;
+			color: #8B3EEC;
+			margin: 0 0 10px;
+			font-weight: bolder;
+		}
+		
+		a{
+			color: #6295B1;
+			text-decoration: none;
+			font-weight: bold;
+		}
+	
+	#wrapper{
+		position: relative;
+		margin: 0 auto;
+		width: 800px;
+		height: 100%;
+	}
+		
+		#slider{
+			height:600px;
+			background-color: linear-gradient(to bottom right, #CC9FFF 0%, #F5D6FF 100%);
+			overflow: hidden;
+			position:relative;
+			margin: 50px 0 0;
+			border: 5px solid #8B3EEC;
+			border-radius: 10px;
+			-webkit-border-radius: 10px;
+			-webkit-box-shadow: 0 -1px 4px -2px #FFF, 0 1px 6px -2px #000;
+			box-shadow: 0 -1px 4px -2px #FFF, 0 1px 6px -2px #000;
+		}
+			.image{
+				position: absolute;
+				top: 10px;
+				left: 274px;
+				z-index: 100;
+			}
+	
+			#bar{
+				position: absolute;
+				top: 0;
+				left:50%;
+				width: 7px;
+				height: 100%;
+				background: #8B3EEC;
+				z-index: 90;
+				-webkit-box-shadow: 0 0 40px #000;
+				box-shadow: 0 0 40px #000;
+			}
+				
+			
+			#mask{
+				overflow: hidden;
+				position:relative;
+				height: 100%;
+				width: 50%;
+				z-index: 10;
+			}
+			
+				#final{
+					position: absolute;
+					top: 0;
+					right:0;
+					width: 100%;
+					height: 100%;
+					background-repeat: no-repeat;
+					background: url(https://t1.daumcdn.net/cfile/tistory/99B5ED3D5D48281E16);
+					
+					
+				}
+
+			#blueprint{
+				position: absolute;
+				top: 0;
+				left:0;
+				width: 100%;
+				height: 100%;
+				background-repeat: no-repeat;
+				background: url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdpI2Kpdn92wA-zF215CF0i9t_MxAiaJEmMQ&usqp=CAU);
+	
+				
+			}
+  </style>
+  <script>
+  	    function getParam(sname) {
             var params = location.search.substr(location.search.indexOf("?") + 1);
             var sval = "";
             params = params.split("&");
@@ -16,16 +133,56 @@
         }
 
         var url = getParam("secure");
-    </script>
+  </script>
+
 </head>
 <body>
-<img id="before">
-<img id="after">
+<!-- partial:index.partial.html -->
+<div id="title">
+	<h1>Traffic Light Result</h1>		
+</div>
+
+<div id="wrapper">
+	
+	<div id="slider">
+		
+		<img src="http://www.thibaudb.com/wp-content/uploads/drag.png" alt="" class="image" />
+		<div id="bar"></div>
+		
+		<div id="mask">
+			<div id="blueprint">
+			</div>
+		</div>
+		
+		<div id="final">
+		</div>
+	</div>
+
+</div>
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
 
 <script>
-    document.getElementById('before').src='static/upload/' + url;
-    document.getElementById('after').src='static/results/' + url;
+	$( "#bar" ).draggable({ 
+		distance: 20,
+		delay: 100,
+		axis: "x",
+		start: function() {
+			$('.image').fadeOut();
+		},
+		drag: function() {
+			
+			var toto = $('#bar').position().left,
+				foo	 = $('#mask').css({ width: toto + 5 });
+		},
+		stop: function() {
+			//alert( $('#bar').position().left );
+		}
+	});
+
+	$("#final").css({"background":"url("+'static/upload/' + url+") no-repeat"}); 			
+	$("#blueprint").css({"background":"url("+'static/results/' + url+") no-repeat"}); 			
 </script>
 </body>
-
 </html>
