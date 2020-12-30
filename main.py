@@ -79,6 +79,15 @@ def upload_file():
         findimg('static/upload/' + secure_filename(f.filename), 'static/results/' + secure_filename(f.filename))
         return redirect(url_for('result_page', secure=secure_filename(f.filename)))
 
+@app.route('/api/fileUpload', methods=['GET', 'POST'])
+def upload_api():
+    if request.method =='POST':
+        f = request.files['file']
+        f.save('static/upload/' + secure_filename(f.filename))
+        findimg('static/upload/' + secure_filename(f.filename), 'static/results/' + secure_filename(f.filename))
+        return 'static/results/' + secure_filename(f.filename)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
 
