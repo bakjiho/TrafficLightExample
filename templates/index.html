@@ -240,6 +240,8 @@ $dropzone.on('drag dragstart dragend dragover dragenter dragleave drop', functio
 	droppedFiles = e.originalEvent.dataTransfer.files;
 	fileName = droppedFiles[0]['name'];
 	$('.filename').html(fileName);
+  $("input:file")[0].files= droppedFiles
+  console.log(droppedFiles[0]);
 	$('.dropzone .upload').hide();
 });
 
@@ -249,6 +251,7 @@ $button.bind('click', function() {
 
 $("input:file").change(function (){
 	fileName = $(this)[0].files[0].name;
+  console.log($(this)[0].files[0])
 	$('.filename').html(fileName);
 	$('.dropzone .upload').hide();
 });
