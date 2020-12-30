@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import cv2
 import numpy as np
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -85,7 +85,7 @@ def upload_api():
         f = request.files['file']
         f.save('static/upload/' + secure_filename(f.filename))
         findimg('static/upload/' + secure_filename(f.filename), 'static/results/' + secure_filename(f.filename))
-        return 'static/results/' + secure_filename(f.filename)
+        return send_file('static/results/' + secure_filename(f.filename))
 
 
 if __name__ == '__main__':
