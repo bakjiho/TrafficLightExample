@@ -5,15 +5,57 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
 import hashlib
 import uuid
+import threading
+import time
+from queue import Queue, Empty
 
 app = Flask(__name__)
-
+requests_queue = Queue()
+BATCH_SIZE = 1
+CHECK_INTERVAL = 0.1
 net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
 classes = []
 with open("coco.names", "r") as f:
     classes = [line.strip() for line in f.readlines()]
 layer_names = net.getLayerNames()
 output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+
+
+# request handling
+def handle_requests_by_batch():
+    try:
+        while True:
+            requests_batch = []
+            while not (len(requests_batch) >= BATCH_SIZE):
+                try:
+                    requests_batch.append(requests_queue.get(timeout=CHECK_INTERVAL))
+                except Empty:
+                    continue
+
+            batch_outputs = ['done']
+
+            for request in requests_batch:
+                if len(request["input"]) == 1:
+                	findimg(request['input'][0][0], request['input'][0][1])
+            for request, output in zip(requests_batch, batch_outputs):
+                request["output"] = output
+
+    except Exception as e:
+        while not requests_queue.empty():
+            requests_queue.get()
+        print(e)
+
+threading.Thread(target=handle_requests_by_batch).start()
+
+
+@app.route('/queue-clear')
+def queue_debug():
+    try:
+        requests_queue.queue.clear()
+        return 'Clear', 200
+    except Exception:
+        return jsonify({'message': 'Queue clear error'}), 400
+
 
 def findimg(imgpath, resultpath):
     global net, classes, layer_names, output_layers
@@ -81,21 +123,51 @@ def result_page():
 
 @app.route('/fileUpload', methods=['GET', 'POST'])
 def upload_file():
-    if request.method =='POST':
-        f = request.files['file']
-        uuidstr = str(uuid.uuid4())
-        f.save('static/upload/' + uuidstr + '.jpg')
-        findimg('static/upload/' + uuidstr + '.jpg', 'static/results/' + uuidstr + '.jpg')
-        return redirect(url_for('result_page', secure=uuidstr + '.jpg'))
+	if requests_queue.qsize() > BATCH_SIZE:	
+		return Response("Too many requests", status=429)
+	uuidstr = str(uuid.uuid4())
+	try:
+		args = []
+		if request.method =='POST':
+			f = request.files['file']
+			f.save('static/upload/' + uuidstr + '.jpg')
+			args.append(('static/upload/' + uuidstr + '.jpg', 'static/results/' + uuidstr + '.jpg'))
+	except Exception:
+		print("Wrong file")
+		return Response("fail", status=400)
+	req = {
+		'input': args
+	}
+	requests_queue.put(req)
+
+	while 'output' not in req:
+		time.sleep(CHECK_INTERVAL)
+	return redirect(url_for('result_page', secure=uuidstr + '.jpg'))	
+
 
 @app.route('/api/fileUpload', methods=['GET', 'POST'])
 def upload_api():
-    if request.method =='POST':
-        f = request.files['file']
-        uuidstr = str(uuid.uuid4())
-        f.save('static/upload/' + uuidstr + '.jpg')
-        findimg('static/upload/' + uuidstr + '.jpg', 'static/results/' + uuidstr + '.jpg')
-        return send_file('static/results/' + uuidstr + '.jpg')
+	if requests_queue.qsize() > BATCH_SIZE:	
+		return Response("Too many requests", status=429)
+	uuidstr = str(uuid.uuid4())
+	try:
+		args = []
+		if request.method =='POST':
+			f = request.files['file']
+			f.save('static/upload/' + uuidstr + '.jpg')
+			args.append(('static/upload/' + uuidstr + '.jpg', 'static/results/' + uuidstr + '.jpg'))
+	except Exception:
+		print("Wrong file")
+		return Response("fail", status=400)
+
+	req = {
+		'input': args
+	}
+	requests_queue.put(req)
+
+	while 'output' not in req:
+		time.sleep(CHECK_INTERVAL)
+	return send_file('static/results/' + uuidstr + '.jpg')
 
 
 if __name__ == '__main__':
