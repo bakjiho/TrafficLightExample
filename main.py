@@ -3,16 +3,20 @@ import cv2
 import numpy as np
 from flask import Flask, render_template, request, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
+import hashlib
+import uuid
 
 app = Flask(__name__)
 
+net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
+classes = []
+with open("coco.names", "r") as f:
+    classes = [line.strip() for line in f.readlines()]
+layer_names = net.getLayerNames()
+output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+
 def findimg(imgpath, resultpath):
-    net = cv2.dnn.readNet("yolov3.weights", "yolov3.cfg")
-    classes = []
-    with open("coco.names", "r") as f:
-        classes = [line.strip() for line in f.readlines()]
-    layer_names = net.getLayerNames()
-    output_layers = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
+    global net, classes, layer_names, output_layers
     colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
     # get image
@@ -66,6 +70,10 @@ def findimg(imgpath, resultpath):
 @app.route('/')
 def home_page():
     return render_template('index.html')
+    
+@app.route('/healthz')
+def health_page():
+    return 'ok'
 
 @app.route('/result')
 def result_page():
@@ -75,17 +83,19 @@ def result_page():
 def upload_file():
     if request.method =='POST':
         f = request.files['file']
-        f.save('static/upload/' + secure_filename(f.filename))
-        findimg('static/upload/' + secure_filename(f.filename), 'static/results/' + secure_filename(f.filename))
-        return redirect(url_for('result_page', secure=secure_filename(f.filename)))
+        uuidstr = str(uuid.uuid4())
+        f.save('static/upload/' + uuidstr + '.jpg')
+        findimg('static/upload/' + uuidstr + '.jpg', 'static/results/' + uuidstr + '.jpg')
+        return redirect(url_for('result_page', secure=uuidstr + '.jpg'))
 
 @app.route('/api/fileUpload', methods=['GET', 'POST'])
 def upload_api():
     if request.method =='POST':
         f = request.files['file']
-        f.save('static/upload/' + secure_filename(f.filename))
-        findimg('static/upload/' + secure_filename(f.filename), 'static/results/' + secure_filename(f.filename))
-        return send_file('static/results/' + secure_filename(f.filename))
+        uuidstr = str(uuid.uuid4())
+        f.save('static/upload/' + uuidstr + '.jpg')
+        findimg('static/upload/' + uuidstr + '.jpg', 'static/results/' + uuidstr + '.jpg')
+        return send_file('static/results/' + uuidstr + '.jpg')
 
 
 if __name__ == '__main__':
