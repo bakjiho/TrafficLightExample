@@ -169,6 +169,26 @@ def upload_api():
 		time.sleep(CHECK_INTERVAL)
 	return send_file('static/results/' + uuidstr + '.jpg')
 
+@app.route('/api/locust')
+def locust_api():
+    if requests_queue.qsize() > BATCH_SIZE: 
+        return Response("Too many requests", status=429)
+    try:
+        args = []
+        args.append(('static/upload/example.jpg', 'static/results/example.jpg'))
+    except Exception:
+        print("Wrong file")
+        return Response("fail", status=400)
+
+    req = {
+        'input': args
+    }
+    requests_queue.put(req)
+
+    while 'output' not in req:
+        time.sleep(CHECK_INTERVAL)
+    return send_file('static/results/example.jpg')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
